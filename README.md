@@ -13,6 +13,10 @@ NATTEN version 0.15.1
 
 > pip install natten==0.15.1+torch200cu117 -f https://shi-labs.com/natten/wheels
 
+Pyrubberband-cli
+
+> sudo apt install rubberband-cli
+
 To install All-In-One Music Structure Analyzer: https://github.com/mir-aidj/all-in-one/tree/main (LINUX, MACOS RECOMMANDED!)
 
 ### Launch the app

@@ -1,6 +1,8 @@
 from utils import increase_array_size
 import librosa
 import numpy as np
+import pyrubberband as pyrb
+import pyloudnorm as pyln
 
 # Mashup Technics
 # In this file, you may add mashup technics
@@ -9,7 +11,7 @@ import numpy as np
 # You may find useful methods in the track.py file
 # Be sure to return a Track object
 
-def mashup_technic(tracks, phase_fit=False):
+def mashup_technic(tracks, phase_fit=False, target_loudness=-14.0):
     # Mashup technic with first beat alignment and bpm sync
     sr = tracks[0].sr # The first track is used to determine the target bpm
     tempo = tracks[0].bpm
@@ -36,7 +38,7 @@ def mashup_technic(tracks, phase_fit=False):
 
         # Change the bpm if there is no phase fit
         if not phase_fit:
-            track_audio_accelerated = librosa.effects.time_stretch(track_audio_no_offset, rate = tempo / track_tempo)
+            track_audio_accelerated = pyrb.time_stretch(track_audio_no_offset, track_sr, rate = tempo / track_tempo)
         else:
             #bpm is handled in segment.py
             track_audio_accelerated = track_audio_no_offset
@@ -53,6 +55,15 @@ def mashup_technic(tracks, phase_fit=False):
         mashup = mashup[:main_track_length]
     else:
         mashup = increase_array_size(mashup, main_track_length)
+
+    # Apply LUFS normalization to the mashup
+    meter = pyln.Meter(sr)  # Create a BS.1770 loudness meter
+    mashup_loudness = meter.integrated_loudness(mashup)  # Measure the loudness
+    print(f"Mashup loudness (before normalization): {mashup_loudness} LUFS")
+
+    # Normalize the mashup to the target loudness (-14 LUFS by deafult)
+    mashup_normalized = pyln.normalize.loudness(mashup, mashup_loudness, target_loudness)
+    print(f"Mashup normalized to {target_loudness} LUFS")
 
     # we return a modified version of the first track
     # doing so, we keep its metadata

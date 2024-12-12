@@ -1,6 +1,7 @@
 import json
 import librosa
 import numpy as np
+import pyrubberband as pyrb
 
 from utils import note_to_frequency, calculate_pitch_shift, get_path,\
       increase_array_size
@@ -67,7 +68,7 @@ class Track:
     def __repitch(self, semitone_shift):
         # Function to repitch a track using a semitone shift
         # https://www.youtube.com/watch?v=Y2lUmwB7lzI
-        shifted_audio = librosa.effects.pitch_shift(y=self.audio, sr=self.sr, n_steps=semitone_shift)
+        shifted_audio = pyrb.pitch_shift(y=self.audio, sr=self.sr, n_steps=semitone_shift)
         self.audio = shifted_audio
 
 
@@ -167,7 +168,7 @@ class Track:
                     if len(target_segment.beats) > 0:
                         target_bpm = len(target_segment.beats)/target_segment.duration
 
-                        segment_fitted = segment.get_audio_beat_fitted(len(target_segment.beats), target_bpm, len(target_segment.audio))
+                        segment_fitted = segment.get_audio_beat_fitted(len(target_segment.beats), target_bpm, len(target_segment.audio), self.sr)
                         audio = np.concatenate([audio, segment_fitted.audio])
 
                         # reset first beat position per segment

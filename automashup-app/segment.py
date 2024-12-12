@@ -1,6 +1,6 @@
 import numpy as np
 import copy
-import librosa
+import pyrubberband as pyrb
 from utils import closest_index
 
 # Define a Track class to represent a part of a track
@@ -85,7 +85,7 @@ class Segment:
         self.audio = np.concatenate((self.audio, self.audio))
 
 
-    def get_audio_beat_fitted(self, beat_number, tempo, duration):
+    def get_audio_beat_fitted(self, beat_number, tempo, duration, sr):
         """
         Adjusts the audio segment to fit a specified number of beats at a given tempo.
 
@@ -122,7 +122,7 @@ class Segment:
 
                 # We calculate the rate of stretch for the segment.
                 stretch_rate = tempo / segment_bpm
-                result.audio = librosa.effects.time_stretch(result.audio, rate=stretch_rate)
+                result.audio = pyrb.time_stretch(result.audio, sr, rate=stretch_rate)
 
                 # We concatenate the segment to itself if it's shorter than the target
                 while len(result.beats) < beat_number:
